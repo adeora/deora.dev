@@ -1,0 +1,2 @@
+# deora.dev
+personal website
