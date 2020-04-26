@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Corgi!</title>
+        <style>
+            html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            img, #insert {
+                height: 90%;
+            }
+        </style>
+    </head>
+    <body>
+
+    <a href="/corgi">Show me a new corgo</a>
+
+    Page Reload Interval (seconds): <input type="number" value=30 id="reload-input" 
+                                     onchange="setReloadTime(this.value)"
+                                     oninput="setReloadTime(this.value)" />
+
+    <div id="insert">
+        <p id="placeholder">Loading your corgi...</p>
+    </div>
+
+    <script type="text/javascript">
+    let reloadInterval = 30000;
+
+    function load_corgo(data) {
+        const potential_corgos = data.data.children.map((datum) => datum.data.url)
+                    .filter(url => url.includes('.jpg') || url.includes('.png'));
+        const corgo = potential_corgos[Math.floor(Math.random()*potential_corgos.length)];
+
+        const img = document.createElement('img');
+        img.src = corgo;
+        insert.replaceChild(img, placeholder);
+    }
+
+    function setReloadTime(value) {
+        console.log(`setting reload time to {value}`);
+        reloadInterval = (value) ? parseInt(value) * 1000 : reloadInterval;
+        updateQueryParams(reloadInterval);
+        document.getElementById('reload-input').value = value;
+        setTimeout(() => {location.reload()}, reloadInterval);
+    }
+
+    function updateQueryParams(time) {
+        const searchParams = new URLSearchParams(window.location.search);
+        searchParams.set('time', time / 1000);
+        const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString();
+        history.pushState(null, '', newRelativePathQuery);
+    }
+
+    window.onload = function() {
+        const url = new URL(location.href);
+        const time = url.searchParams.get('time');
+        setReloadTime(time);
+    }
+
+    </script>
+    <script type="text/javascript" src="https://www.reddit.com/r/corgi/.json?jsonp=load_corgo&limit=200"></script>
+    </body>
+
